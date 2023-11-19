@@ -1,0 +1,83 @@
+import random
+import time
+
+class Concursante:
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.progreso = {'tiempo_clasificatoria': 0,
+                         'premio_obtenido': 0,
+                         'ultima_pregunta_correcta': 0,
+                         'comodines_utilizados': 0}
+
+    def clasificar(self):
+        print(f"{self.nombre} está siendo clasificado...")
+        self.progreso['tiempo_clasificatoria'] = random.randint(10, 30)
+        print(f"{self.nombre} se ha clasificado en {self.progreso['tiempo_clasificatoria']} segundos.")
+
+    def responder_pregunta(self, pregunta):
+        print(f"{self.nombre}, aquí tienes la pregunta {pregunta['numero']}: {pregunta['enunciado']}")
+        print("Opciones:", pregunta['opciones'])
+        
+        respuesta_concursante = input("Selecciona tu respuesta: ").upper()
+
+        if respuesta_concursante == pregunta['respuesta_correcta']:
+            self.progreso['premio_obtenido'] += pregunta['premio']
+            self.progreso['ultima_pregunta_correcta'] = pregunta['numero']
+            print(f"¡Correcto! Has ganado {pregunta['premio']} pesos.")
+            return True
+        else:
+            print(f"Incorrecto. Te retiras con {self.progreso['premio_obtenido']} pesos.")
+            return False
+
+    def utilizar_comodin(self, comodin):
+        if comodin == '50/50':
+            print("Usando comodín 50/50...")
+            # Lógica para eliminar dos opciones incorrectas
+            opciones_restantes = [opc for opc in pregunta['opciones'] if opc != pregunta['respuesta_correcta']]
+            opciones_restantes = random.sample(opciones_restantes, 2)
+            opciones_restantes.append(pregunta['respuesta_correcta'])
+            opciones_restantes.sort()
+            pregunta['opciones'] = opciones_restantes
+            self.progreso['comodines_utilizados'] += 1
+        elif comodin == 'ayuda_del_publico':
+            print("Usando comodín ayuda del público...")
+            # Lógica para simular la estadística del público y ajustar las probabilidades
+            self.progreso['comodines_utilizados'] += 1
+        elif comodin == 'llamada_a_un_amigo':
+            print("Usando comodín llamada a un amigo...")
+            # Lógica para simular la llamada a un amigo
+            self.progreso['comodines_utilizados'] += 1
+
+def ejecutar_juego():
+    concursantes = [Concursante("Juan"), Concursante("Ana")]
+    preguntas = [{'numero': 1, 'enunciado': 'Pregunta 1', 'opciones': ['A', 'B', 'C', 'D'], 'respuesta_correcta': 'A', 'premio': 1000},
+                 {'numero': 2, 'enunciado': 'Pregunta 2', 'opciones': ['A', 'B', 'C', 'D'], 'respuesta_correcta': 'B', 'premio': 2000},
+                 # Agrega más preguntas aquí
+                 ]
+
+    for concursante in concursantes:
+        concursante.clasificar()
+
+        for pregunta in preguntas:
+            if not concursante.responder_pregunta(pregunta):
+                break
+
+            if pregunta['numero'] < len(preguntas):
+                comodin_usado = input("¿Deseas utilizar un comodín? (si/no): ").lower()
+                if comodin_usado == 'si':
+                    tipo_comodin = input("Selecciona el tipo de comodín (50/50/ayuda_del_publico/llamada_a_un_amigo): ")
+                    concursante.utilizar_comodin(tipo_comodin)
+
+    generar_reporte_final(concursantes)
+
+def generar_reporte_final(concursantes):
+    print("\nReporte Final:")
+    for concursante in concursantes:
+        print(f"\n{concursante.nombre}:")
+        print(f"  - Tiempo de clasificación: {concursante.progreso['tiempo_clasificatoria']} segundos")
+        print(f"  - Preguntas respondidas correctamente: {concursante.progreso['ultima_pregunta_correcta']}")
+        print(f"  - Premio obtenido: {concursante.progreso['premio_obtenido']} pesos")
+        print(f"  - Comodines utilizados: {concursante.progreso['comodines_utilizados']}")
+
+# Ejecutar el juego
+ejecutar_juego()
